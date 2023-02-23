@@ -2,6 +2,8 @@ const fs = require('fs');
 const http = require("http");  //"http" -> handle the request and response inside node js
                                // http give us networking capability such as building an http server
 
+const url = require('url');
+
 // ////////////////////////////////////
 // ////    FILE SYSTEM
 
@@ -36,9 +38,25 @@ const http = require("http");  //"http" -> handle the request and response insid
 
 ////////////////////////////////////
 ///// SERVER
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
+    const dataObj = JSON.parse(data);
 
 const server = http.createServer((req, res) => {
-    res.end("Hello from the server!");
+    const pathName = req.url;
+    
+    if(pathName === '/' || pathName === '/overview'){
+        res.end('This is OVERVIEW');
+    } else if(pathName === '/product'){
+        res.end('This is PRODUCT');
+    } else if(pathName === '/api'){
+        res.writeHead(200, {'Content-type': 'application/json'});
+        res.end(data);
+    }else {
+        res.writeHead(404, {
+            'Content-type': 'text/html'
+        });
+        res.end("<h1>Page not found!</h1>");
+    }
 });
 
 server.listen(8000, '127.0.0.1', () => {
