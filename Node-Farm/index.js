@@ -1,10 +1,10 @@
 const fs = require('fs');
-const http = require("http");  //"http" -> handle the request and response inside node js
-                               // http give us networking capability such as building an http server
+const http = require('http'); //"http" -> handle the request and response inside node js
+// http give us networking capability such as building an http server
 
 const url = require('url');
 const slugify = require('slugify');
-const replaceTemplate = require('./modules/replaceTemplate')
+const replaceTemplate = require('./modules/replaceTemplate');
 
 // ////////////////////////////////////
 // ////    FILE SYSTEM
@@ -15,7 +15,6 @@ const replaceTemplate = require('./modules/replaceTemplate')
 // // const textOut = `This is what we know about the file system: ${textIn}. \n Created on ${Date.now()}`;
 // // fs.writeFileSync('./txt/output.txt', textOut);
 // // console.log('File Written!');
-
 
 // //Non-Blocking, asynchronous way ( reading File )
 // fs.readFile('./txt/start.txt', 'utf-8', (err, data1) => {
@@ -36,58 +35,64 @@ const replaceTemplate = require('./modules/replaceTemplate')
 // });
 // console.log('Will read file!');
 
-
-
 ////////////////////////////////////
 ///// SERVER
 
-const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8');
-const tempCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8');
-const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8');
-
+const tempOverview = fs.readFileSync(
+  `${__dirname}/templates/template-overview.html`,
+  'utf-8'
+);
+const tempCard = fs.readFileSync(
+  `${__dirname}/templates/template-card.html`,
+  'utf-8'
+);
+const tempProduct = fs.readFileSync(
+  `${__dirname}/templates/template-product.html`,
+  'utf-8'
+);
 
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
-    const dataObj = JSON.parse(data);
+const dataObj = JSON.parse(data);
 
-    const slugs = dataObj.map(el => slugify(el.productName, {lower: true})); 
-    console.log(slugs);
-    // console.log(slugify('Fresh Avocados', {lower: true}));
+const slugs = dataObj.map((el) => slugify(el.productName, { lower: true }));
+console.log(slugs);
+// console.log(slugify('Fresh Avocados', {lower: true}));
 
 const server = http.createServer((req, res) => {
-    //ES-6 destructuring
-    const {query, pathname} = (url.parse(req.url, true))
-    
-    
-    //Overview page
-    if(pathname === '/' || pathname === '/overview'){
-        res.writeHead(200, {'Content-type': 'text/html'});
+  //ES-6 destructuring
+  const { query, pathname } = url.parse(req.url, true);
 
-        const cardsHtml = dataObj.map((el) => replaceTemplate(tempCard, el)).join('');
-        const output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml);
-        res.end(output);
+  //Overview page
+  if (pathname === '/' || pathname === '/overview') {
+    res.writeHead(200, { 'Content-type': 'text/html' });
 
-        //Product page
-    } else if(pathname === '/product'){
-        res.writeHead(200, {'Content-type': 'text/html'});
-        const product = dataObj[query.id];
-        const output = replaceTemplate(tempProduct, product);
-        res.end(output);
+    const cardsHtml = dataObj
+      .map((el) => replaceTemplate(tempCard, el))
+      .join('');
+    const output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml);
+    res.end(output);
 
-        //API
-    } else if(pathname === '/api'){
-        res.writeHead(200, {'Content-type': 'application/json'});
-        res.end(data);
+    //Product page
+  } else if (pathname === '/product') {
+    res.writeHead(200, { 'Content-type': 'text/html' });
+    const product = dataObj[query.id];
+    const output = replaceTemplate(tempProduct, product);
+    res.end(output);
 
-        //Not found
-    }else {
-        res.writeHead(404, {
-            'Content-type': 'text/html'
-        });
-        res.end("<h1>Page not found!</h1>");
-    }
+    //API
+  } else if (pathname === '/api') {
+    res.writeHead(200, { 'Content-type': 'application/json' });
+    res.end(data);
+
+    //Not found
+  } else {
+    res.writeHead(404, {
+      'Content-type': 'text/html',
+    });
+    res.end('<h1>Page not found!</h1>');
+  }
 });
 
 server.listen(8000, '127.0.0.1', () => {
-    console.log("Listening to the port on 8000");
+  console.log('Listening to the port on 8000');
 });
-
