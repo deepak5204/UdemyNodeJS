@@ -1,9 +1,24 @@
 const fs = require('fs');
 const express = require('express');
+const morgan = require('morgan');
 
 const app = express();
 
+// MIDDLEWARE
+
+app.use(morgan('dev'));
 app.use(express.json()); // here "express.json()" is middlware and middleware is just a function that modify the incoming request
+
+//create own middleware
+app.use((req, res, next) => {
+  console.log('Hello from the middleware!');
+  next();
+});
+
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
 
 // app.get('/', (req, res) => {
 //   res.status(200).json({
@@ -108,11 +123,10 @@ const deleteTour = (req, res) => {
 // app.patch('/api/v1/tours/:id', updateTour);
 // app.delete('/api/v1/tours/:id', deleteTour);
 
-app.route('/api/v1/tours')
-    .get(getAllTours)
-    .post(createTour);
+app.route('/api/v1/tours').get(getAllTours).post(createTour);
 
-  app.route('/api/v1/tours/:id')
+app
+  .route('/api/v1/tours/:id')
   .get(getTour)
   .patch(updateTour)
   .delete(deleteTour);
