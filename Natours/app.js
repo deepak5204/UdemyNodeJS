@@ -11,6 +11,7 @@ const app = express();
 
 app.use(morgan('dev'));
 app.use(express.json()); // here "express.json()" is middlware and middleware is just a function that modify the incoming request
+app.use(express.static(`${__dirname}/public/`));//static file
 
 //create own middleware
 app.use((req, res, next) => {

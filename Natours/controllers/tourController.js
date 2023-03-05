@@ -21,8 +21,8 @@ const tours = JSON.parse(
         status: 'fail0',
         message: 'Missing name and price'
       })
-      next();
     }  
+    next();
   };
   
 exports.getAllTours = (req, res) => {
