@@ -8,8 +8,12 @@ const userRouter = require('./routes/userRoutes')
 const app = express();
 
 // 1) MIDDLEWARE
+// console.log(process.env.NODE_ENV);
 
-app.use(morgan('dev'));
+if(process.env.NODE_ENV === 'development'){
+  app.use(morgan('dev'));
+}
+// app.use(morgan('dev'));
 app.use(express.json()); // here "express.json()" is middlware and middleware is just a function that modify the incoming request
 app.use(express.static(`${__dirname}/public/`));//static file
 
