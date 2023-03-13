@@ -52,13 +52,29 @@ const Tour = require('./../models/tourModel');
       query = query.sort('-createdAt'); // '-createdAt':- descending order, 'createdAt':- Ascending order 
     }
 
-    //3) Field limiting
+    //3) FIELD LIMITING
     if(req.query.fields){
       const fields = req.query.fields.split(',').join(' '); //produce projected fields
       query = query.select(fields); // select only reqired fields (called projection), ex:- (name, price,difficulty, etc.)
     } else {
       query = query.select('-__v'); //here -__v is excluding, here '-'(minus) representing excluding only these field
     }
+
+
+    // 4) PAGINATIO
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+
+    query = query.skip(skip).limit(limit);
+
+    if(req.query.page){
+      const numTours = await Tour.countDocuments();
+      if(skip >= numTours){
+        throw new Error('This page does not exit!');
+      }
+    }
+
     
     //QUERY LOOK LIKE IN MONGODB
     //difficulty
@@ -72,15 +88,11 @@ const Tour = require('./../models/tourModel');
     //   difficulty: 'easy'
     // });
 
-    // const tours = await Tour.find()
-    //   .where('duration')
-    //   .equals(5)
-    //   .where('difficulty')
-    //   .equals('easy');
 
 
 //EXECUTE QUERY
     const tours = await query;
+    //query.sort().select().skip().limit()
 
 //SEND RESPONSE
     res.status(200).json({
