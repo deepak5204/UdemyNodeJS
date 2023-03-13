@@ -49,7 +49,15 @@ const Tour = require('./../models/tourModel');
       query = query.sort(sortBy);
       //sort('price ratingsAverage)
     } else {
-      query = query.sort('-createdAt');
+      query = query.sort('-createdAt'); // '-createdAt':- descending order, 'createdAt':- Ascending order 
+    }
+
+    //3) Field limiting
+    if(req.query.fields){
+      const fields = req.query.fields.split(',').join(' '); //produce projected fields
+      query = query.select(fields); // select only reqired fields (called projection), ex:- (name, price,difficulty, etc.)
+    } else {
+      query = query.select('-__v'); //here -__v is excluding, here '-'(minus) representing excluding only these field
     }
     
     //QUERY LOOK LIKE IN MONGODB
