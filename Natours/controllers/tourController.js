@@ -203,3 +203,46 @@ exports.deleteTour = async (req, res) => {
     });
   }
   };
+
+
+  exports.getTourStats = async (req, res) => {
+    try{
+      const stats = await Tour.aggregate([
+       {
+         //match- select or filter certain document
+         $match: { ratingsAverage: { $gte: 4.5 }}
+       },
+       {
+        //it allows the documents to group together, basically using accumelator
+        $group: {
+          // _id: '$ratingsAverage',
+          _id: { $toUpper: '$difficulty' },
+          numTours: { $sum: 1 },
+          numRatings: { $sum: '$ratingQuantity' },
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' }
+        }
+      },
+      {
+        $sort: { avgPrice: 1 }
+      },
+      // {
+      //   $match : { _id: { $ne: 'EASY' } }
+      // }
+      ]);
+
+      res.status(200).json({
+        status: 'success',
+        data: {
+          stats
+        }
+      })
+    } catch(err){
+        res.status(404).json({
+          status: 'fail',
+          message: err
+        });
+    }
+  }
