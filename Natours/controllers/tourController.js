@@ -213,7 +213,7 @@ exports.deleteTour = async (req, res) => {
          $match: { ratingsAverage: { $gte: 4.5 }}
        },
        {
-        //it allows the documents to group together, basically using accumelator
+        //it allows the documents to group together, basically using accumelator for grouping
         $group: {
           // _id: '$ratingsAverage',
           _id: { $toUpper: '$difficulty' },
