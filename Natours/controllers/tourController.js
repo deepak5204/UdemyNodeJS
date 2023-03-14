@@ -28,8 +28,8 @@ const Tour = require('./../models/tourModel');
   //here use middleware
   exports.aliasTopTours = (req, res, next) => {
     req.query.limit = '5';
-    req.query.sort = '-ratingsAverage,price';
-    req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+    req.query.sort = '-ratingsAverage,price'; //here '-' used for decending order
+    req.query.fields = 'name,price,ratingsAverage,summary,difficulty'; //show only these fields 
     next();
   }
   
@@ -70,8 +70,8 @@ const Tour = require('./../models/tourModel');
 
 
     // 4) PAGINATIO
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 100;
+    const page = req.query.page * 1 || 1; //here convert string to integer and set default 1
+    const limit = req.query.limit * 1 || 100; ////here convert string to integer and set default 100
     const skip = (page - 1) * limit;
 
     query = query.skip(skip).limit(limit);
