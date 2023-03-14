@@ -32,56 +32,108 @@ const Tour = require('./../models/tourModel');
     req.query.fields = 'name,price,ratingsAverage,summary,difficulty'; //show only these fields 
     next();
   }
+
+
+  class APIFeatures {
+    //constructor
+    constructor(query, queryString) {
+      this.query = query;
+      this.queryString = queryString ;
+    }
+
+    filter() {
+      const queryObj = {...this.queryString};
+      const excludedFields = ['page', 'sort', 'limit','fields'];
+      excludedFields.forEach(el => delete queryObj[el]);
+  
+      //1.B) ADVANCE FILTERING
+      let queryStr = JSON.stringify(queryObj);
+      queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`); 
+      this.query.find(JSON.parse(queryStr));
+      return this;
+    }
+
+    sort() {
+    if(this.queryString.sort) {
+      const sortBy = this.queryString.sort.split(',').join(' ');
+      this.query = this.query.sort(sortBy);
+    } else {
+      this.query = this.query.sort('-createdAt'); // '-createdAt':- descending order, 'createdAt':- Ascending order 
+    }
+    return this;
+  }
+
+  limitFields() {
+     if(this.queryString.fields){
+      const fields = this.queryString.fields.split(',').join(' '); //produce projected fields
+      this.query = this.query.select(fields); // select only reqired fields (called projection), ex:- (name, price,difficulty, etc.)
+    } else {
+      this.query = this.query.select('-__v'); //here -__v is excluding, here '-'(minus) representing excluding only these field
+    }
+    return this;
+  }
+
+  paginate() {
+    const page = this.queryString.page * 1 || 1; //here convert string to integer and set default 1
+    const limit = this.queryString.limit * 1 || 100; ////here convert string to integer and set default 100
+    const skip = (page - 1) * limit;
+
+    this.query = this.query.skip(skip).limit(limit);
+    return this;
+  }
+  }
   
   exports.getAllTours = async (req, res) => {
     try{
-      //-------------ADD FILTERS-------------//
 
+// {
+  // keep for reference
+      //-------------ADD FILTERS-------------//
   //BUILD QUERY
   //1.A) FILTERING
       
-    const queryObj = {...req.query};
+    // const queryObj = {...req.query};
     
-    const excludedFields = ['page', 'sort', 'limit','fields'];
-    excludedFields.forEach(el => delete queryObj[el]);
+    // const excludedFields = ['page', 'sort', 'limit','fields'];
+    // excludedFields.forEach(el => delete queryObj[el]);
 
-    //1.B) ADVANCE FILTERING
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+    // //1.B) ADVANCE FILTERING
+    // let queryStr = JSON.stringify(queryObj);
+    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
     
-    let query = Tour.find(JSON.parse(queryStr));
+    // let query = Tour.find(JSON.parse(queryStr));
     
     //2) SORTING
-    if(req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
-      query = query.sort(sortBy);
-      //sort('price ratingsAverage)
-    } else {
-      query = query.sort('-createdAt'); // '-createdAt':- descending order, 'createdAt':- Ascending order 
-    }
+    // if(req.query.sort) {
+    //   const sortBy = req.query.sort.split(',').join(' ');
+    //   query = query.sort(sortBy);
+    //   //sort('price ratingsAverage)
+    // } else {
+    //   query = query.sort('-createdAt'); // '-createdAt':- descending order, 'createdAt':- Ascending order 
+    // }
 
     //3) FIELD LIMITING
-    if(req.query.fields){
-      const fields = req.query.fields.split(',').join(' '); //produce projected fields
-      query = query.select(fields); // select only reqired fields (called projection), ex:- (name, price,difficulty, etc.)
-    } else {
-      query = query.select('-__v'); //here -__v is excluding, here '-'(minus) representing excluding only these field
-    }
+    // if(req.query.fields){
+    //   const fields = req.query.fields.split(',').join(' '); //produce projected fields
+    //   query = query.select(fields); // select only reqired fields (called projection), ex:- (name, price,difficulty, etc.)
+    // } else {
+    //   query = query.select('-__v'); //here -__v is excluding, here '-'(minus) representing excluding only these field
+    // }
 
 
-    // 4) PAGINATIO
-    const page = req.query.page * 1 || 1; //here convert string to integer and set default 1
-    const limit = req.query.limit * 1 || 100; ////here convert string to integer and set default 100
-    const skip = (page - 1) * limit;
+    // 4) PAGINATIOn
+    // const page = req.query.page * 1 || 1; //here convert string to integer and set default 1
+    // const limit = req.query.limit * 1 || 100; ////here convert string to integer and set default 100
+    // const skip = (page - 1) * limit;
 
-    query = query.skip(skip).limit(limit);
+    // query = query.skip(skip).limit(limit);
 
-    if(req.query.page){
-      const numTours = await Tour.countDocuments();
-      if(skip >= numTours){
-        throw new Error('This page does not exit!');
-      }
-    }
+    // if(req.query.page){
+    //   const numTours = await Tour.countDocuments();
+    //   if(skip >= numTours){
+    //     throw new Error('This page does not exit!');
+    //   }
+    // }
 
     
     //QUERY LOOK LIKE IN MONGODB
@@ -95,12 +147,16 @@ const Tour = require('./../models/tourModel');
     //   duration: 5,
     //   difficulty: 'easy'
     // });
-
-
+// }
 
 //EXECUTE QUERY
-    const tours = await query;
-    //query.sort().select().skip().limit()
+const features = new APIFeatures(Tour.find(), req.query)
+  .filter()
+  .sort()
+  .limitFields()
+  .paginate();
+
+const tours = await features.query;
 
 //SEND RESPONSE
     res.status(200).json({
