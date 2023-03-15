@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const validator = require('validator');
 
 const tourSchema = new mongoose.Schema({
     name: {
@@ -8,7 +9,8 @@ const tourSchema = new mongoose.Schema({
       unique: true, //unique is not validator
       trim: true,
       maxlength: [40, 'A tour name must have less or equal 40 character'],
-      minlength: [10, 'A tour name must have at least 10 character']
+      minlength: [10, 'A tour name must have at least 10 character'],
+      // validate: [validator.isAlpha, 'Tour name must only contain sharacter']
     },
     slug: String,
     duration: {
@@ -39,7 +41,15 @@ const tourSchema = new mongoose.Schema({
       type: Number,
       required: [true, 'A tour must have a price'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator:  function(val) {
+          return val < this.price; //this only points to current doc on NEW document creation
+        },
+        message: 'Discount price ({VALUE}) should be below regular price'
+      } 
+    },
     summary: {
       type: String,
       trim: true
@@ -74,7 +84,7 @@ const tourSchema = new mongoose.Schema({
     return this.duration / 7; //this point to current document
   });
 
-  //DOCUMENT MIDDLEWARE;- runs before .save() and .create()
+  //DOCUMENT MIDDLEWARE;- runs before .save() and .create() but not for update
   tourSchema.pre('save', function(next){
     this.slug = slugify(this.name, { lower: true}); //this points currently process document 
     next();
@@ -93,7 +103,6 @@ const tourSchema = new mongoose.Schema({
   //QUERY MIDDLEWARE
   tourSchema.pre(/^find/, function (next) {
     this.find({secretTour: {$ne: true}});
-
     this.start = Date.now();
     next();
   });
