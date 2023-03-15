@@ -94,11 +94,15 @@ const tourSchema = new mongoose.Schema({
 
   tourSchema.post(/^find/, function(docs, next) {
     console.log(`Query took ${Date.now()- this.satrt} milliseconds!`);
-    console.log(docs);
-    
     next();
-    
-  })
+  });
+
+  //AGGREGATION MIDDLEWARE
+  tourSchema.pre('aggregate', function(next) {
+    this.pipeline().unshift({ $match: { secretTour: { $ne: true} } });
+    console.log(this.pipeline()); //this points to current aggregation object
+    next();
+  });
 
   const Tour = mongoose.model('Tour', tourSchema);
   module.exports = Tour;
