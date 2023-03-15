@@ -51,8 +51,17 @@ const tourSchema = new mongoose.Schema({
       select: false // hide from response 
     },
     startDates: [Date]
+  }, {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
   });
   
+//VIRTUAL PROPERTY
+  //here we cannot use virtual property in a query, because this property not part of database
+  tourSchema.virtual('durationWeek').get(function (){ //here I used regular function because I have to return this keyword
+    return this.duration / 7; //this point to current document
+  })
+
   const Tour = mongoose.model('Tour', tourSchema);
   module.exports = Tour;
   
