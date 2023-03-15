@@ -171,7 +171,7 @@ exports.updateTour = async (req, res) => {
    try{
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
-      // runValidators: true
+      runValidators: true,
       useUnifiedTopology: true 
     });
 
