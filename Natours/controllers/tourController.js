@@ -1,5 +1,6 @@
 const Tour = require('./../models/tourModel');
 const APIFeatures = require('./../utils/apiFeatures.js');
+const catchAsync = require('./../utils/catchAsync');
 
 // const tours = JSON.parse(
 //     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -144,31 +145,24 @@ exports.getTour = async (req, res) => {
     })
   }
   };
+
+  // const catchAsync = fn => {
+  //   return (req, res, next) => {
+  //     fn(req, res, next).catch(err => next(err));
+  //   }
+  // }
   
-exports.createTour = async (req, res) => {
-  try{
-      // const newTour = new Tour({})
-  // newTour.save()
+exports.createTour = catchAsync( async (req, res, next) => {
+   //Here Tour models directly call create method
+   const newTour = await Tour.create(req.body);
 
-  //Here Tour models directly call create method
-  const newTour = await Tour.create(req.body);
-
-  res.status(201).json({
-         status: 'success',
-         data: {
-           tour: newTour,
-         },
-       });
-  } catch (err){
-    res.status(400).json({
-      status: 'fail',
-      message: 'Invalid data sent!',
-      data: {
-        err
-      }
-    })
-  }
-  };
+   res.status(201).json({
+          status: 'success',
+          data: {
+            tour: newTour,
+          },
+        });
+  });
   
 exports.updateTour = async (req, res) => {
    try{

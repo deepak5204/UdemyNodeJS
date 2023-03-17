@@ -44,6 +44,6 @@ app.all('*', (req, res, next) =>{
 });
 
 //ERROR HANDLING MIDDLEWARE (GLOBAL ERROR HANDLING)
-app.use()
+// app.usse()
 
 module.exports = app;
