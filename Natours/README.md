@@ -1,6 +1,7 @@
 ## Working with Default and Check
-## AGGREGATION PIPELINE
+# AGGREGATION PIPELINE
 
+### Aggregation
 ```bash
     Aggregation is a way of processing a large amount of documents in a collection by means of passing them through different stages.
 
