@@ -148,7 +148,7 @@ exports.getTour = async (req, res) => {
 
   // const catchAsync = fn => {
   //   return (req, res, next) => {
-  //     fn(req, res, next).catch(err => next(err));
+  //     fn(req, res, next).catch(err => next(err));//catch(err => next(err))
   //   }
   // }
   
@@ -202,40 +202,43 @@ exports.deleteTour = async (req, res) => {
   };
 
 
+
+  //---------AGGREGATE PIPELINE------------//
+
   exports.getTourStats = async (req, res) => {
     try{
-      const stats = await Tour.aggregate([
-       {
-         //match- select or filter certain document
-         $match: { ratingsAverage: { $gte: 4.5 }}
+      const pipeline = [
+        {
+          //match- select or filter certain document
+          $match: { ratingsAverage: { $gte: 4.5 }}
+        },
+        {
+         //it allows the documents to group together, basically using accumelator for grouping
+         $group: {
+           // _id: '$ratingsAverage',
+           _id: { $toUpper: '$difficulty' },
+           numTours: { $sum: 1 },
+           numRatings: { $sum: '$ratingQuantity' },
+           avgRating: { $avg: '$ratingsAverage' },
+           avgPrice: { $avg: '$price' },
+           minPrice: { $min: '$price' },
+           maxPrice: { $max: '$price' }
+         }
        },
        {
-        //it allows the documents to group together, basically using accumelator for grouping
-        $group: {
-          // _id: '$ratingsAverage',
-          _id: { $toUpper: '$difficulty' },
-          numTours: { $sum: 1 },
-          numRatings: { $sum: '$ratingQuantity' },
-          avgRating: { $avg: '$ratingsAverage' },
-          avgPrice: { $avg: '$price' },
-          minPrice: { $min: '$price' },
-          maxPrice: { $max: '$price' }
-        }
-      },
-      {
-        $sort: { avgPrice: 1 }
-      },
-      // {
-      //   $match : { _id: { $ne: 'EASY' } }
-      // }
-      ]);
-
+         $sort: { avgPrice: 1 }
+       },
+       // {
+       //   $match : { _id: { $ne: 'EASY' } }
+       // }
+       ]
+      const stats = await Tour.aggregate(pipeline);
       res.status(200).json({
         status: 'success',
         data: {
           stats
         }
-      })
+      });
     } catch(err){
         res.status(404).json({
           status: 'fail',
@@ -248,8 +251,7 @@ exports.deleteTour = async (req, res) => {
   exports.getMonthlyPlan = async(req, res) =>{
     try{
       const year = req.param.year * 1; //2021
-
-      const plan = await Tour.aggregate([
+      const pipeline = [
         {
           $unwind: '$startDates'
         },
@@ -282,7 +284,9 @@ exports.deleteTour = async (req, res) => {
         {
           $limit: 12
         }
-      ]);
+      ];
+
+      const plan = await Tour.aggregate(pipeline);
 
       res.status(200).json({
         status: 'success',
