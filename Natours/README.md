@@ -20,6 +20,6 @@
 ## what is pipeline?
     > A pipeline is a sequence of data aggregation operations or stages.
 
-    >A pipeline is an array.
+    > A pipeline is an array.
 
-    * Stages is nothing but operations*
+    Stages is nothing but operations.
