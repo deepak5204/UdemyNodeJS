@@ -13,5 +13,13 @@
 ```
 
 
-### command
+### Aggregate Command
     db.collection.aggregate(pipeline)
+
+
+## what is pipeline?
+    > A pipeline is a sequence of data aggregation operations or stages.
+
+    >A pipeline is an array.
+
+    * Stages is nothing but operations*
