@@ -252,7 +252,8 @@ exports.deleteTour = async (req, res) => {
     try{
       const year = req.param.year * 1; //2021
       const pipeline = [
-        {
+        { 
+          // unwind deconstruct an array field from the input documents then output one document for each element of the array
           $unwind: '$startDates'
         },
         {
@@ -275,7 +276,7 @@ exports.deleteTour = async (req, res) => {
         },
         {
           $project: {
-            _id: 0
+            _id: 0 // _id: 0 :- means no longer shows, if we put "1" it would show
          }
         },
         {
