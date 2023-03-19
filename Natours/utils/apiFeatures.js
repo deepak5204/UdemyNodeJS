@@ -30,7 +30,7 @@ class APIFeatures {
 
   limitFields() {
      if(this.queryString.fields){
-      const fields = this.queryString.fields.split(',').join(''); //produce projected fields
+      const fields = this.queryString.fields.split(',').join(' '); //produce projected fields
       this.query = this.query.select(fields); // select only reqired fields (called projection), ex:- (name, price,difficulty, etc.)
     } else {
       this.query = this.query.select('-__v'); //here -__v is excluding, here '-'(minus) representing excluding only these field
