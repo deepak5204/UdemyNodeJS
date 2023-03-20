@@ -1,6 +1,7 @@
 const Tour = require('./../models/tourModel');
 const APIFeatures = require('./../utils/apiFeatures.js');
 const catchAsync = require('./../utils/catchAsync');
+const AppError = require('./../utils/appError');
 
 // const tours = JSON.parse(
 //     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -123,6 +124,10 @@ const tours = await features.query;
 exports.getTour = catchAsync( async (req, res, next) => {
       const tour = await Tour.findById(req.params.id);//id similar to tourRoutes
       //Tour.findOne({ _id: req.params.id});
+
+      if(!tour){
+        return next(new AppError('No tour found with that id', 404))
+      }
   
     res.status(200).json({
       status: 'success',
@@ -157,6 +162,10 @@ exports.updateTour = catchAsync( async (req, res, next) => {
       useUnifiedTopology: true 
     });
 
+    if(!tour){
+      return next(new AppError('No tour found with that id', 404))
+    }
+
     res.status(200).json({
       status: 'succes',
       data:{
@@ -167,6 +176,11 @@ exports.updateTour = catchAsync( async (req, res, next) => {
   
 exports.deleteTour = catchAsync( async (req, res, next) => {
     const deletedTour = await Tour.findByIdAndDelete(req.params.id);
+
+    if(!deletedTour){
+      return next(new AppError('No tour found with that id', 404))
+    }
+
     res.status(204).json({
       data: null
     });
