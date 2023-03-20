@@ -37,8 +37,7 @@ const catchAsync = require('./../utils/catchAsync');
 
 
   
-  exports.getAllTours = async (req, res) => {
-    try{
+  exports.getAllTours = catchAsync( async (req, res, next) => {
 // {
   // keep for reference
       //-------------ADD FILTERS-------------//
@@ -119,16 +118,9 @@ const tours = await features.query;
         tours,
       },
     });
-  } catch (err){
-    res.status(404).json({
-      status: 'fail',
-      message: err
-    });
-  }
-  };
+  });
   
-exports.getTour = async (req, res) => {
-    try{
+exports.getTour = catchAsync( async (req, res, next) => {
       const tour = await Tour.findById(req.params.id);//id similar to tourRoutes
       //Tour.findOne({ _id: req.params.id});
   
@@ -138,13 +130,7 @@ exports.getTour = async (req, res) => {
         tour,
       },
     });
-  } catch (err){
-    res.status(404).json({
-      status: 'fail',
-      message: err
-    })
-  }
-  };
+  });
 
   // const catchAsync = fn => {
   //   return (req, res, next) => {
@@ -164,8 +150,7 @@ exports.createTour = catchAsync( async (req, res, next) => {
         });
   });
   
-exports.updateTour = async (req, res) => {
-   try{
+exports.updateTour = catchAsync( async (req, res, next) => {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
@@ -178,35 +163,20 @@ exports.updateTour = async (req, res) => {
         tour
       }
     })
-   } catch (err){
-    res.status(404).json({
-      status: 'fail',
-      message: 'Invalid data sent!'
-    })
-   }
-   
-  };
+  });
   
-exports.deleteTour = async (req, res) => {
-  try{
+exports.deleteTour = catchAsync( async (req, res, next) => {
     const deletedTour = await Tour.findByIdAndDelete(req.params.id);
     res.status(204).json({
       data: null
     });
-
-  } catch (err){
-    res.status(404).json({
-      err
-    });
-  }
-  };
+  });
 
 
 
   //---------AGGREGATE PIPELINE------------//
 
-  exports.getTourStats = async (req, res) => {
-    try{
+  exports.getTourStats = catchAsync( async (req, res, next) => {
       const pipeline = [
         {
           //match- select or filter certain document
@@ -239,17 +209,10 @@ exports.deleteTour = async (req, res) => {
           stats
         }
       });
-    } catch(err){
-        res.status(404).json({
-          status: 'fail',
-          message: err
-        });
-    }
-  }
+  })
 
 
-  exports.getMonthlyPlan = async(req, res) =>{
-    try{
+  exports.getMonthlyPlan = catchAsync( async(req, res, next) =>{
       const year = req.param.year * 1; //2021
       const pipeline = [
         { 
@@ -295,11 +258,4 @@ exports.deleteTour = async (req, res) => {
           plan
         }
       });
-    }
-    catch(err){
-      res.status(404).json({
-        status: 'fail',
-        message: err
-      });
-    }
-  }
+  });

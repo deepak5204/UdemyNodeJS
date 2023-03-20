@@ -35,10 +35,10 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
 app.all('*', (req, res, next) =>{
-  next(new AppError(`cant find ${req.originalUrl} on this server!`, 404));
+    next(new AppError(`cant find ${req.originalUrl} on this server!`, 404));
 });
 
-//ERROR HANDLING MIDDLEWARE (GLOBAL ERROR HANDLING)
+// //ERROR HANDLING MIDDLEWARE (GLOBAL ERROR HANDLING)
 app.use(globalErrorHandler);
 
 module.exports = app;
