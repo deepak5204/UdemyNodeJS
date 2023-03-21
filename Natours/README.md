@@ -48,4 +48,37 @@ An aggregation pipeline can return results for groups of documents. For example,
 
 ```
 In simple terms, authentication is the process of verifying who a user is, while authorization is the process of verifying what they have access to. Comparing these processes to a real-world example, when you go through security in an airport, you show your ID to authenticate your identity.
+
+```
+
+
+#### Use validator for password confirmation
+``` 
+This only works on CREATE and SAVE!!!!
+```
+
+
+### Install bcryptjs package for encryption 
+
+```
+Bcrypt turns a simple password into fixed-length characters called a hash. Before hashing a password, bcrypt applies a salt , a unique random string that makes the hash unpredictable. 
+
+Command:  npm i bcryptjs
+
+```
+```node
+
+    userSchema.pre('save', async function(next) {
+        //only run this function if password was actually modified
+        if(!this.isModified('password')){
+            return next();
+        }
+
+        //Hash the password with cost of 12
+        this.password = await bcrypt.hash(this.password, 12); //encrypt the password
+
+        //delete passwordConfirm field 
+        this.passwordConfirm = undefined; 
+        next();
+    });
 ```
