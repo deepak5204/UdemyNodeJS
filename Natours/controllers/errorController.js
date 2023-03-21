@@ -7,9 +7,8 @@ const handleCadtErrorDB = err => {
 };
 
 const handleDuplicateFieldsDB = err => {
-  const value = err.message.match(/(["'])(?:(?=(\\?))\2.)*?\1/);
-  console.log(err.message);
-  console.log('4564545');
+  const value = message.match(/(["'])(\\?.)*?\1/);
+  console.log(value);
   
   const message = 'Duplicate field value: x. Please use another value!'
 }
