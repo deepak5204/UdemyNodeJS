@@ -37,3 +37,15 @@ The documents that are output from a stage are passed to the next stage.
 An aggregation pipeline can return results for groups of documents. For example, return the total, average, maximum, and minimum values.
 
 ```
+
+
+# AUTHENTICATION, AUTHORIZATION and SECURITY
+
+```
+**Authentication**, **Authorization** are all about signing up, logging in and accessing pages or routes that we grant them permission to do so.
+```
+
+
+```
+In simple terms, authentication is the process of verifying who a user is, while authorization is the process of verifying what they have access to. Comparing these processes to a real-world example, when you go through security in an airport, you show your ID to authenticate your identity.
+```
