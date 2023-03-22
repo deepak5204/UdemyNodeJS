@@ -82,3 +82,11 @@ Command:  npm i bcryptjs
         next();
     });
 ```
+
+### JSON Web Token (JWT)
+```
+JSON web tocken are a stateless solution for authentication. There is no need to any session state on the server, which is perfect for RESTful API.
+```
+
+### GROUP BY
+### what is JWT and how it works?
