@@ -17,6 +17,11 @@ const handleValidationErrorDB = (err) => {
   return new AppError(message, 400);
 };
 
+const handleJWTExpiredError = err =>{
+  const message ='Your token has been expired! Please login again'
+  return new AppError(message, 401)
+}
+
 const  handleJWTError = err => {
   const message = "Invalid token. Please login again!";
   return new AppError(message, 401)
@@ -75,8 +80,12 @@ module.exports = (err, req, res, next) => {
       error = handleValidationErrorDB(error);
     }
 
-    if(err.name === 'JsonWebTokenError') {
+    if(error.name === 'JsonWebTokenError') {
       error = handleJWTError(error);
+    }
+
+    if(error.name === 'TokenExpiredError') {
+      error = handleJWTExpiredError(error)
     }
 
     sendErrorProd(error, res);
