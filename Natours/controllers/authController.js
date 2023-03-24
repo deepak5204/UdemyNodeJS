@@ -1,3 +1,4 @@
+const { promisify } = require('util'); //use ES6 destructuring
 const jwt =require('jsonwebtoken');
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
@@ -72,10 +73,13 @@ exports.protect = catchAsync(async (req, res, next) => {
         );
     }
     
-    // 2) Verification token
+    // 2) Verification token   
+   const decoded = await promisify( jwt.verify)(token, process.env.JWT_SECRET);
+   console.log(decoded);
+   
 
     // 3) Check if user still exists
 
-    // 4) Check if user change password after the taken was issued
+    // 4) Check if user change password after the token was issued
     next();
 })
