@@ -2,7 +2,8 @@ const AppError = require('./../utils/appError');
 
 const handleCadtErrorDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}.`;
-  return new AppError(message, 400);};
+  return new AppError(message, 400);
+};
 
 const handleDuplicateFieldsDB = (err) => {
   const value = message.match(/(["'])(\\?.)*?\1/);
@@ -17,15 +18,15 @@ const handleValidationErrorDB = (err) => {
   return new AppError(message, 400);
 };
 
-const handleJWTExpiredError = err =>{
-  const message ='Your token has been expired! Please login again'
-  return new AppError(message, 401)
-}
+const handleJWTExpiredError = (err) => {
+  const message = 'Your token has been expired! Please login again';
+  return new AppError(message, 401);
+};
 
-const  handleJWTError = err => {
-  const message = "Invalid token. Please login again!";
-  return new AppError(message, 401)
-}
+const handleJWTError = (err) => {
+  const message = 'Invalid token. Please login again!';
+  return new AppError(message, 401);
+};
 
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
@@ -80,12 +81,12 @@ module.exports = (err, req, res, next) => {
       error = handleValidationErrorDB(error);
     }
 
-    if(error.name === 'JsonWebTokenError') {
+    if (error.name === 'JsonWebTokenError') {
       error = handleJWTError(error);
     }
 
-    if(error.name === 'TokenExpiredError') {
-      error = handleJWTExpiredError(error)
+    if (error.name === 'TokenExpiredError') {
+      error = handleJWTExpiredError(error);
     }
 
     sendErrorProd(error, res);
